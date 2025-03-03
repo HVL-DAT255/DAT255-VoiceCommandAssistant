@@ -11,3 +11,12 @@ pip install -r requirements.txt
 
 python src/main.py
 
+
+For later when using streamlit:
+
+
+streamlit run app.py
+
+
+
+

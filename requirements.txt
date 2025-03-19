@@ -1,6 +1,8 @@
+tensorflow
+librosa
+numpy
+scikit-learn
+sounddevice
 pygame
 SpeechRecognition
 PyAudio
-tensorflow
-
-

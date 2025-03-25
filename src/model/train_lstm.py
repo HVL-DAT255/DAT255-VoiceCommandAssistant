@@ -1,6 +1,6 @@
 import numpy as np
 import tensorflow as tf
-from tensorflow.keras.models import Model  # For functional API
+from tensorflow.keras.models import Model 
 from tensorflow.keras.layers import Input, Conv1D, BatchNormalization, Bidirectional, LSTM, Dense, Dropout
 import os
 from sklearn.model_selection import train_test_split

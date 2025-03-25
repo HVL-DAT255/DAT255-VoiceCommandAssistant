@@ -3,9 +3,12 @@ import tensorflow as tf
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import LSTM, Dense, Dropout
 import os
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import classification_report, confusion_matrix
 
 #path to processed data
 PROCESSED_DIR = "/Users/mariushorn/Desktop/hvl/6_semester/DAT255/Eksamensoppgave/DAT255-VoiceCommandAssistant/data/processed"
+MODEL_DIR = "/Users/mariushorn/Desktop/hvl/6_semester/DAT255/Eksamensoppgave/DAT255-VoiceCommandAssistant/models"
 
 def load_data():
     """ Load preprocessed data """
@@ -48,6 +51,12 @@ def train_and_save_model():
     X, y_cat, num_classes = load_data()
     print("data loaded. X shape: ", X.shape, "y shape: ", y_cat.shape)
 
+    #create train/test split
+    X_train, X_test, y_train, y_test = train_test_split(X, y_cat, test_size=0.2, random_state=42)
+
+    print("Train data: ", X_train.shape, y_train.shape)
+    print("Test data: ", X_test.shape, y_test.shape)
+
     #2. build model
     model = build_lstm_model(input_shape=(X.shape[1], X.shape[2]), num_classes=num_classes)
     model.summary()
@@ -55,13 +64,29 @@ def train_and_save_model():
     #3. train model
     history = model.fit(X, y_cat, epochs=20, batch_size=32, validation_split=0.2)
 
-    #4. save the trained model
-    os.makedirs(os.path.join(PROCESSED_DIR, "models"), exist_ok=True)
-    model_path = os.path.join(PROCESSED_DIR, "models", "lstm_model.h5")
+    #4. evaulate on the test set
+    test_loss, test_acc = model.evaluate(X_test, y_test)
+    print(f"\n Test accuracy: {test_acc:.4f}, Test loss: {test_loss:.4f}\n")
+
+    #5. confusion matrix and classification report
+    y_pred = model.predict(X_test)
+    y_pred = np.argmax(y_pred_probs, axis=1)
+    y_true = np.argmax(y_test, axis=1)
+
+    cm = confusion_matrix(y_true, y_pred)
+    print("Confusion matrix: ")
+    print(cm)
+
+    print("\nClassification report: ")
+    print(classification_report(y_true, y_pred))
+
+
+    #6. save the trained model
+    os.makedirs(MODEL_DIR, exist_ok=True)
+    model_path = os.path.join(MODEL_DIR, "lstm_model.h5")
     model.save(model_path)
-    print("Model saved to {model_path}")
+    print(f"Model saved to {model_path}")
 
 if __name__ == "__main__":
     train_and_save_model()
 
-    

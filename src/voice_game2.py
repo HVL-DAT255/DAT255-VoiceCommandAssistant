@@ -2,7 +2,7 @@ import pygame
 import time
 import random
 from game import TicTacToeGame
-from live_predict import record_audio, predict_command
+from live_predict2 import record_audio, predict_command
 
 class VoiceControlledGame(TicTacToeGame):
     def __init__(self, width=300, height=300):

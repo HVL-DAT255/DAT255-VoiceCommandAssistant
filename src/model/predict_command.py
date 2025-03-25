@@ -1,6 +1,13 @@
 import os
+import sys
 import numpy as np
 import tensorflow as tf
+
+current_dir = os.path.dirname(__file__)
+parent_dir = os.path.abspath(os.path.join(current_dir, ".."))
+if parent_dir not in sys.path:
+    sys.path.append(parent_dir)
+
 from preprocess import preprocess_audio
 
 # Define your command classes (must match the order used during training)

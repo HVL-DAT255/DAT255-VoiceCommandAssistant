@@ -70,7 +70,7 @@ def train_and_save_model():
 
     #5. confusion matrix and classification report
     y_pred = model.predict(X_test)
-    y_pred = np.argmax(y_pred_probs, axis=1)
+    y_pred = np.argmax(y_pred, axis=1)
     y_true = np.argmax(y_test, axis=1)
 
     cm = confusion_matrix(y_true, y_pred)

@@ -35,7 +35,7 @@ history = model.fit(
 )
 
 # Save trained model
-model.save("../models/speech_cnn.h5")
+model.save("/Users/sondrerisnes/Documents/GitHub/DAT255-VoiceCommandAssistant/models/speech_cnn.h5")
 print("Model training complete! Saved at '../models/speech_cnn.h5'.")
 
 from sklearn.metrics import classification_report

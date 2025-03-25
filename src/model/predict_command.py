@@ -15,7 +15,7 @@ COMMANDS = ["up", "down", "left", "right", "yes"]
 
 # Path to the saved LSTM model (update the path if necessary)
 MODEL_DIR = "/Users/mariushorn/Desktop/hvl/6_semester/DAT255/Eksamensoppgave/DAT255-VoiceCommandAssistant/models"
-MODEL_PATH = os.path.join(MODEL_DIR, "lstm_model.h5")
+MODEL_PATH = os.path.join(MODEL_DIR, "lstm_model.keras")
 
 def predict_command(file_path):
     """
@@ -48,5 +48,5 @@ def predict_command(file_path):
 
 if __name__ == "__main__":
     # Replace with the path to an actual audio file from your raw data directory
-    test_file_path = "/Users/mariushorn/Desktop/hvl/6_semester/DAT255/Eksamensoppgave/DAT255-VoiceCommandAssistant/data/raw/left/0d393936_nohash_2.wav"
+    test_file_path = "/Users/mariushorn/Desktop/hvl/6_semester/DAT255/Eksamensoppgave/DAT255-VoiceCommandAssistant/data/raw/yes/0bd689d7_nohash_0.wav"
     predict_command(test_file_path)

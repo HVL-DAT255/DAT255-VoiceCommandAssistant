@@ -5,6 +5,8 @@ from tensorflow.keras.layers import LSTM, Dense, Dropout
 import os
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report, confusion_matrix
+from sklearn.utils import class_weight
+
 
 #path to processed data
 PROCESSED_DIR = "/Users/mariushorn/Desktop/hvl/6_semester/DAT255/Eksamensoppgave/DAT255-VoiceCommandAssistant/data/processed"
@@ -57,15 +59,21 @@ def train_and_save_model():
     print("Train data: ", X_train.shape, y_train.shape)
     print("Test data: ", X_test.shape, y_test.shape)
 
+    #Compute class weights to help improve recall
+    y_train_integers = np.argmax(y_train, axis=1)  # Convert one-hot labels back to integers
+    weights = class_weight.compute_class_weight("balanced", classes=np.unique(y_train_integers), y=y_train_integers)
+    class_weights_dict = dict(enumerate(weights))
+    print("Class weights:", class_weights_dict)
+
     #2. build model
     model = build_lstm_model(input_shape=(X.shape[1], X.shape[2]), num_classes=num_classes)
     model.summary()
 
     #3. train model
-    history = model.fit(X, y_cat, epochs=20, batch_size=32, validation_split=0.2)
+    history = model.fit(X_train, y_train, epochs=50, batch_size=32, validation_split=0.2, class_weight=class_weights_dict)
 
     #4. evaulate on the test set
-    test_loss, test_acc = model.evaluate(X_test, y_test)
+    test_loss, test_acc = model.evaluate(X_test, y_test, verbose=0)
     print(f"\n Test accuracy: {test_acc:.4f}, Test loss: {test_loss:.4f}\n")
 
     #5. confusion matrix and classification report
@@ -83,7 +91,7 @@ def train_and_save_model():
 
     #6. save the trained model
     os.makedirs(MODEL_DIR, exist_ok=True)
-    model_path = os.path.join(MODEL_DIR, "lstm_model.h5")
+    model_path = os.path.join(MODEL_DIR, "lstm_model.keras")
     model.save(model_path)
     print(f"Model saved to {model_path}")
 

@@ -4,7 +4,7 @@ import librosa
 import tensorflow as tf
 import os
 
-MODEL_PATH = "/Users/mariushorn/Desktop/hvl/6_semester/DAT255/Eksamensoppgave/DAT255-VoiceCommandAssistant/models/lstm_model.h5"
+MODEL_PATH = "/Users/mariushorn/Desktop/hvl/6_semester/DAT255/Eksamensoppgave/DAT255-VoiceCommandAssistant/models/lstm_model.keras"
 LABELS = ["up", "down", "left", "right", "yes"] 
 
 # Audio config

@@ -12,9 +12,9 @@ os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 def preprocess_audio(file_path, max_length=16000):
     """ Load an audio file, pad or truncate, and extract MFCC features """
-    y, sr = librosa.load(file_path, sr=16000)  # Load with fixed sample rate
-    y = librosa.util.fix_length(y, size=max_length)  # Pad/truncate to 1 sec
-    mfcc = librosa.feature.mfcc(y=y, sr=sr, n_mfcc=40)  # Compute MFCCs
+    y, sr = librosa.load(file_path, sr=16000)  
+    y = librosa.util.fix_length(y, size=max_length)  
+    mfcc = librosa.feature.mfcc(y=y, sr=sr, n_mfcc=40)  
     return mfcc
 
 def save_features():

@@ -1,8 +1,11 @@
 import pygame
+import time
+from live_predict import record_audio, predict_command
 
 class TicTacToeGame:
     def __init__(self, width=300, height=300):
         pygame.init()
+        self.selected_cell = 4  # Start in the center
         self.width = width
         self.height = height
         self.line_width = 5  # Bredden på linjene
@@ -35,6 +38,17 @@ class TicTacToeGame:
                 pygame.draw.circle(self.screen, (0, 0, 255), (x, y), 30, self.line_width)
         pygame.display.update()
 
+        # Highlight selected cell
+        row = self.selected_cell // 3
+        col = self.selected_cell % 3
+        x = col * (self.width // 3)
+        y = row * (self.height // 3)
+        cell_rect = pygame.Rect(x, y, self.width // 3, self.height // 3)
+        pygame.draw.rect(self.screen, (0, 255, 0), cell_rect, 3)
+
+
+
+
     def update_board(self, pos):
         if self.board[pos] == " ":
             self.board[pos] = self.current_player
@@ -55,6 +69,7 @@ class TicTacToeGame:
         return None
 
     def run(self):
+        last_input_time = 0
         running = True
         clock = pygame.time.Clock()
         self.draw_board()

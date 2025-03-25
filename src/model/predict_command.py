@@ -48,5 +48,5 @@ def predict_command(file_path):
 
 if __name__ == "__main__":
     # Replace with the path to an actual audio file from your raw data directory
-    test_file_path = "/Users/mariushorn/Desktop/hvl/6_semester/DAT255/Eksamensoppgave/DAT255-VoiceCommandAssistant/data/raw/up/0ac15fe9_nohash_0.wav"
+    test_file_path = "/Users/mariushorn/Desktop/hvl/6_semester/DAT255/Eksamensoppgave/DAT255-VoiceCommandAssistant/data/raw/left/0d393936_nohash_2.wav"
     predict_command(test_file_path)

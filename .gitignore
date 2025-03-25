@@ -1,5 +1,9 @@
 venv/
 venv/
+
 .venv/
 .venv/
+__pycache__/
+*.pyc
+>>>>>>> 72d30e87d55ec79a10ddcf0bae983c36211c9c9c
 

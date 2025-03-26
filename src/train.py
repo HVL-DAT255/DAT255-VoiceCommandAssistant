@@ -2,7 +2,7 @@ import numpy as np
 import tensorflow as tf
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report
-from model import build_cnn  # make sure this exists
+from src import build_cnn  # make sure this exists
 
 # Load preprocessed features and labels
 X = np.load("data/processed/X.npy")

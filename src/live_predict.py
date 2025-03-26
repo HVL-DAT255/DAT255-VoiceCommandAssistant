@@ -4,6 +4,7 @@ import librosa
 import tensorflow as tf
 import os
 
+MODEL_PATH = "//Users/mariushorn/Desktop/hvl/6_semester/DAT255/Eksamensoppgave/DAT255-VoiceCommandAssistant/models/speech_cnn.h5"
 MODEL_PATH = "/Users/mariushorn/Desktop/hvl/6_semester/DAT255/Eksamensoppgave/DAT255-VoiceCommandAssistant/models/speech_cnn.h5"
 LABELS = ["up", "down", "left", "right", "yes"] 
 

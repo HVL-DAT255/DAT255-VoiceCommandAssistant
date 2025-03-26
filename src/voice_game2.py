@@ -1,137 +1,169 @@
-import pygame
+import streamlit as st
+import numpy as np
 import time
 import random
-from game import TicTacToeGame
-from live_predict2 import record_audio, predict_command
+import os
 
-class VoiceControlledGame(TicTacToeGame):
-    def __init__(self, width=300, height=300):
-        super().__init__(width, height)
-        # Initialize the pointer (cursor) at the center cell (index 4)
-        self.selected_cell = 4
-        pygame.font.init()
-        self.font = pygame.font.SysFont('Arial', 20)
-        self.last_input_time = time.time()
-        self.input_interval = 3.0  # Wait 5 seconds between commands
-        self.waiting_for_input = True
+from live_predict2 import record_audio, predict_command  # Your audio+ML functions
 
-    def draw_message(self, text, color=(0, 0, 0)):
-        """Display a message at the bottom of the screen."""
-        message_surface = self.font.render(text, True, color)
-        rect = message_surface.get_rect(center=(self.width // 2, self.height - 20))
-        # Draw a white rectangle to clear the previous message area
-        clear_rect = pygame.Rect(0, self.height - 40, self.width, 40)
-        pygame.draw.rect(self.screen, (255, 255, 255), clear_rect)
-        self.screen.blit(message_surface, rect)
-        pygame.display.update()
+# ====================== Session State Initialization ======================
+if "board" not in st.session_state:
+    st.session_state.board = [" "] * 9
+if "selected_cell" not in st.session_state:
+    st.session_state.selected_cell = 4  # Start in center
+if "current_player" not in st.session_state:
+    st.session_state.current_player = "X"  # Human is X, computer is O
+if "last_input_time" not in st.session_state:
+    st.session_state.last_input_time = time.time()
 
-    def move_cursor(self, direction):
-        """Update pointer location based on a directional command."""
-        row = self.selected_cell // 3
-        col = self.selected_cell % 3
+# Interval (in seconds) between voice commands
+input_interval = 3.0
 
-        if direction == "up" and row > 0:
-            row -= 1
-        elif direction == "down" and row < 2:
-            row += 1
-        elif direction == "left" and col > 0:
-            col -= 1
-        elif direction == "right" and col < 2:
-            col += 1
+# ====================== Game Logic ======================
+def move_cursor(selected_cell, direction):
+    row = selected_cell // 3
+    col = selected_cell % 3
+    if direction == "up" and row > 0:
+        row -= 1
+    elif direction == "down" and row < 2:
+        row += 1
+    elif direction == "left" and col > 0:
+        col -= 1
+    elif direction == "right" and col < 2:
+        col += 1
+    return row * 3 + col
 
-        self.selected_cell = row * 3 + col
+def check_winner(board):
+    wins = [
+        [0,1,2], [3,4,5], [6,7,8],   # rows
+        [0,3,6], [1,4,7], [2,5,8],   # cols
+        [0,4,8], [2,4,6]            # diagonals
+    ]
+    for a, b, c in wins:
+        if board[a] == board[b] == board[c] and board[a] != " ":
+            return board[a]
+    if " " not in board:
+        return "Draw"
+    return None
 
-    def draw_board(self):
-        """Draw the board (using the base TicTacToeGame drawing) and highlight the selected cell."""
-        super().draw_board()
-        row = self.selected_cell // 3
-        col = self.selected_cell % 3
-        x = col * (self.width // 3)
-        y = row * (self.height // 3)
-        pointer_rect = pygame.Rect(x, y, self.width // 3, self.height // 3)
-        pygame.draw.rect(self.screen, (0, 255, 0), pointer_rect, 3)
-        pygame.display.update()
+def format_board_html(board, selected_cell):
+    """
+    Return an HTML table to display the board, highlighting the selected cell
+    and coloring X and O differently.
+    """
+    html = """
+    <style>
+    .tictactoe {
+        border-collapse: collapse;
+        margin: 0 auto;
+        table-layout: fixed;
+        width: 210px; /* 3 columns * 70px each */
+    }
+    .tictactoe td {
+        border: 2px solid #ccc;
+        width: 70px;
+        height: 70px;
+        text-align: center;
+        vertical-align: middle;
+        font-size: 28px;
+        font-weight: bold;
+        font-family: sans-serif;
+    }
+    .selected {
+        background-color: #FFE066; /* highlight color */
+    }
+    .x-cell {
+        color: #FF3333;  /* X in red */
+    }
+    .o-cell {
+        color: #3333FF;  /* O in blue */
+    }
+    </style>
+    <table class="tictactoe">
+    """
 
-    def run(self):
-        running = True
-        clock = pygame.time.Clock()
-        # Show initial instructions on screen
-        self.draw_board()
-        self.draw_message("Press SPACE to start voice commands")
-        
-        # Wait for user to press SPACE to start the game loop
-        waiting_for_start = True
-        while waiting_for_start:
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    running = False
-                    waiting_for_start = False
-                if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
-                    waiting_for_start = False
-            clock.tick(30)
+    for row in range(3):
+        html += "<tr>"
+        for col in range(3):
+            i = row * 3 + col
+            cell_value = board[i]
+            cell_classes = []
+            # highlight selected cell
+            if i == selected_cell:
+                cell_classes.append("selected")
+            # color X or O
+            if cell_value == "X":
+                cell_classes.append("x-cell")
+            elif cell_value == "O":
+                cell_classes.append("o-cell")
 
-        # Main game loop
-        while running:
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    running = False
+            class_str = " ".join(cell_classes)
+            # blank if empty
+            display_val = cell_value if cell_value != " " else ""
+            html += f'<td class="{class_str}">{display_val}</td>'
+        html += "</tr>"
+    html += "</table>"
+    return html
 
-            # Check if it's time to listen for a command
-            if time.time() - self.last_input_time > self.input_interval:
-                self.draw_board()
-                self.draw_message("Listening...", color=(0, 0, 255))
-                command = predict_command(record_audio())
-                self.draw_message(f"Command: {command}", color=(0, 0, 0))
-                print("Predicted command:", command)
-                self.last_input_time = time.time()
+# ====================== Streamlit UI ======================
+st.title("Voice-Controlled Tic Tac Toe")
 
-                if command in ["up", "down", "left", "right"]:
-                    self.move_cursor(command)
-                elif command == "yes":
-                    if self.board[self.selected_cell] == " ":
-                        self.update_board(self.selected_cell)
-                        winner = self.check_winner()
-                        if winner:
-                            if winner == "Draw":
-                                self.draw_message("It's a draw!", color=(255, 0, 0))
-                                print("It's a draw!")
-                            else:
-                                self.draw_message(f"{winner} wins!", color=(255, 0, 0))
-                                print(f"{winner} wins!")
-                            time.sleep(2)
-                            running = False
-                        else:
-                            self.current_player = "O"  # Switch turn after human move
+st.markdown(
+    """
+    **Instructions:**
+    - Press **Speak Command** to record your voice.
+    - Supported commands: **up**, **down**, **left**, **right**, **yes**.
+    - **"yes"** places your mark (X) on the highlighted cell.
+    - The computer (O) makes a random move afterward.
+    """
+)
+
+# Build and display the HTML board
+board_html = format_board_html(st.session_state.board, st.session_state.selected_cell)
+board_placeholder = st.empty()
+board_placeholder.markdown(board_html, unsafe_allow_html=True)
+
+if st.button("Speak Command"):
+    current_time = time.time()
+    if current_time - st.session_state.last_input_time >= input_interval:
+        st.session_state.last_input_time = current_time
+
+        st.info("Listening...")
+        audio = record_audio()
+        command = predict_command(audio)
+        st.success(f"Predicted command: **{command}**")
+
+        if command in ["up", "down", "left", "right"]:
+            st.session_state.selected_cell = move_cursor(st.session_state.selected_cell, command)
+        elif command == "yes":
+            if st.session_state.board[st.session_state.selected_cell] == " ":
+                st.session_state.board[st.session_state.selected_cell] = st.session_state.current_player
+                winner = check_winner(st.session_state.board)
+                if winner:
+                    if winner == "Draw":
+                        st.warning("Game Over! It's a draw!")
                     else:
-                        self.draw_message("Cell taken! Try again.", color=(255, 0, 0))
+                        st.warning(f"Game Over! {winner} wins!")
                 else:
-                    self.draw_message("Unrecognized command.", color=(255, 0, 0))
-
-                self.draw_board()
-
-                # Computer's turn: choose a random available cell
-                if self.current_player == "O":
-                    pygame.time.wait(500)
-                    available = [i for i, cell in enumerate(self.board) if cell == " "]
-                    if available:
-                        move = random.choice(available)
-                        self.board[move] = self.current_player
-                        self.current_player = "X"
-                        winner = self.check_winner()
-                        if winner:
-                            if winner == "Draw":
-                                self.draw_message("It's a draw!", color=(255, 0, 0))
-                                print("It's a draw!")
+                    # Computer move
+                    free_cells = [i for i, cell in enumerate(st.session_state.board) if cell == " "]
+                    if free_cells:
+                        move = random.choice(free_cells)
+                        st.session_state.board[move] = "O"
+                        st.session_state.current_player = "X"
+                        w = check_winner(st.session_state.board)
+                        if w:
+                            if w == "Draw":
+                                st.warning("Game Over! It's a draw!")
                             else:
-                                self.draw_message(f"{winner} wins!", color=(255, 0, 0))
-                                print(f"{winner} wins!")
-                            time.sleep(2)
-                            running = False
-                    self.draw_board()
+                                st.warning(f"Game Over! {w} wins!")
+            else:
+                st.warning("Cell already taken. Try a different move.")
+        else:
+            st.warning("Unrecognized command.")
 
-            clock.tick(30)
-        pygame.quit()
-
-if __name__ == "__main__":
-    game = VoiceControlledGame()
-    game.run()
+        # Update the board
+        board_html = format_board_html(st.session_state.board, st.session_state.selected_cell)
+        board_placeholder.markdown(board_html, unsafe_allow_html=True)
+    else:
+        st.warning("Please wait a bit longer before speaking again.")

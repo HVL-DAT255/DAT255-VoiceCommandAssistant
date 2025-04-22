@@ -4,7 +4,7 @@ import time
 import random
 import os
 
-from live_predict2 import record_audio, predict_command  # Your audio+ML functions
+from live_predict3 import record_audio, predict_command  # Your audio+ML functions
 
 # ====================== Session State Initialization ======================
 if "board" not in st.session_state:

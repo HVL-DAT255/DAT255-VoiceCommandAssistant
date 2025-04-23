@@ -16,7 +16,7 @@ COMMANDS = ["up", "down", "left", "right", "yes"]
 
 # Path to the saved LSTM model (update the path if necessary)
 MODEL_DIR = "/Users/mariushorn/Desktop/hvl/6_semester/DAT255/Eksamensoppgave/DAT255-VoiceCommandAssistant/models"
-MODEL_PATH = os.path.join(MODEL_DIR, "lstm_mfcc.keras")
+MODEL_PATH = os.path.join(MODEL_DIR, "lstm_net_mfcc.keras")
 
 def pad_or_truncate(mfcc: np.ndarray, target_frames: int) -> np.ndarray:
     """

@@ -1,16 +1,15 @@
-# ───────── Core ML stack ──────────────────────────────────────────
+# Core ML stack
 tensorflow==2.19.0
-# (no more tensorflow-estimator—TF brings in the matching version automatically)
 tensorboard==2.19.0
 tensorboard-data-server==0.7.2
 tensorflow-io-gcs-filesystem==0.37.1
 
-# ───────── Scientific / numeric libs ─────────────────────────────
+# Scientific / numeric libs
 numpy>=1.26.0,<2.2.0
 numba==0.59.1
 pandas==2.2.3
 
-# ───────── Audio / DSP stack ─────────────────────────────────────
+# Audio / DSP stack
 audioread==3.0.1
 librosa==0.11.0
 PyAudio==0.2.14
@@ -18,22 +17,22 @@ sounddevice==0.5.1
 soundfile==0.13.1
 SpeechRecognition==3.14.2
 
-# ───────── Plotting / visualisation ──────────────────────────────
+# Plotting / visualization
 matplotlib==3.9.0
 
-# ───────── Data science / utilities ──────────────────────────────
+# Data science / utilities
 scikit-learn==1.5.0
 streamlit==1.44.1
 pygame==2.6.1
 
-# ───────── Google / auth libs ────────────────────────────────────
+# Google / auth libs (if you use any Google APIs)
 google-pasta==0.2.0
 google-auth==2.39.0
 google-auth-oauthlib==1.2.2
 oauthlib==3.2.2
 cachetools==5.5.2
 
-# ───────── Misc dependencies ─────────────────────────────────────
+# Misc
 certifi==2025.1.31
 charset-normalizer==3.4.1
 click==8.1.8

@@ -23,7 +23,7 @@ if "last_input_time" not in st.session_state:
 input_interval = 3.0
 
 # ====================== Instantiate the recognizer ======================
-MODEL_DIR = "/Users/mariushorn/Desktop/hvl/6_semester/DAT255/Eksamensoppgave/DAT255-VoiceCommandAssistant/src/models"
+MODEL_DIR = "/Users/mariushorn/Desktop/hvl/6_semester/DAT255/Eksamensoppgave/DAT255-VoiceCommandAssistant/models"
 recognizer = VoiceCommandRecognizer(MODEL_DIR)
 
 # ====================== Game Logic ======================

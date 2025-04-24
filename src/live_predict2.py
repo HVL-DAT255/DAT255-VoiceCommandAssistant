@@ -3,46 +3,83 @@ import numpy as np
 import tensorflow as tf
 import sounddevice as sd
 import librosa
+from tensorflow.keras import Model
+from tensorflow.keras.models import load_model
+from tensorflow.keras.layers import InputLayer 
 
-# Configuration: update these paths if needed
-MODEL_DIR_VOICE = "/Users/mariushorn/Desktop/hvl/6_semester/DAT255/Eksamensoppgave/DAT255-VoiceCommandAssistant/models"
-MODEL_PATH_VOICE = os.path.join(MODEL_DIR_VOICE, "lstm_model.keras")
-LABELS = ["up", "down", "left", "right", "yes"]
-
-# Audio configuration
-DURATION = 1.5   # seconds
-SAMPLE_RATE = 16000  # Hz
-
-# Load the pretrained voice command model once
-voice_model = tf.keras.models.load_model(MODEL_PATH_VOICE)
-
-def record_audio(duration=DURATION, sr=SAMPLE_RATE):
-    """Record audio from the microphone for a specified duration."""
-    print("🎙️ Listening... Speak now!")
-    audio = sd.rec(int(duration * sr), samplerate=sr, channels=1, dtype='float32')
-    sd.wait()  # Wait until recording finishes
-    return np.squeeze(audio)
-
-def extract_mfcc(y, sr=SAMPLE_RATE):
-    """Extract MFCC features from an audio signal and fix the time axis to 32 frames."""
-    mfcc = librosa.feature.mfcc(y=y, sr=sr, n_mfcc=40)
-    mfcc = librosa.util.fix_length(mfcc, size=32, axis=1)
-    return mfcc
-
-def predict_command(audio):
+class VoiceCommandRecognizer:
     """
-    Use the pretrained voice model to predict the spoken command.
-    Returns a string from LABELS.
+    Records a short audio clip from the mic, extracts MFCCs, and
+    predicts one of the predefined commands using a pretrained Keras model.
     """
-    mfcc = extract_mfcc(audio)
-    mfcc = mfcc.T  # Transpose to (32, 40): 32 time steps, 40 features
-    mfcc = np.expand_dims(mfcc, axis=0)  # Add batch dimension: (1, 32, 40)
-    pred_probs = voice_model.predict(mfcc)
-    pred_index = np.argmax(pred_probs, axis=1)[0]
-    return LABELS[pred_index]
+    LABELS = ["up", "down", "left", "right", "yes"]
+    DURATION = 1.5       # length of each recording (sec)
+    SAMPLE_RATE = 16000  # sampling rate (Hz)
 
-# For testing purposes:
+    def __init__(self,
+                 model_dir: str,
+                 model_filename: str = "lstm_mfcc.keras"):
+        # where to find the .keras model on disk
+        path = os.path.join(model_dir, model_filename)
+        # load with custom_objects fix for Functional
+        self._model = load_model(
+            path,
+            custom_objects={ "Functional": Model,
+                            "InputLayer": InputLayer
+                            },
+            compile=False
+        )
+
+    def record(self) -> np.ndarray:
+        """
+        Records `DURATION` seconds from the default microphone
+        at SAMPLE_RATE. Returns a 1-D float32 array.
+        """
+        print("🎙️  Listening now...")
+        data = sd.rec(
+            int(self.DURATION * self.SAMPLE_RATE),
+            samplerate=self.SAMPLE_RATE,
+            channels=1,
+            dtype='float32'
+        )
+        sd.wait()
+        return data.squeeze()
+
+    def _extract_mfcc(self, audio: np.ndarray) -> np.ndarray:
+        """
+        Turn raw audio samples into a (1, 63, 40) MFCC batch
+        """
+        mfcc = librosa.feature.mfcc(
+            y=audio,
+            sr=self.SAMPLE_RATE,
+            n_mfcc=40
+        )
+        # fix to exactly 32 frames (time steps)
+        mfcc = librosa.util.fix_length(mfcc, size=63, axis=1)
+        # model expects (batch, time, features)
+        return mfcc.T[np.newaxis, ...]
+
+    def predict(self, audio: np.ndarray) -> str:
+        """
+        Given a raw audio array, return the top-1 command string.
+        """
+        batch = self._extract_mfcc(audio)
+        probs = self._model.predict(batch)
+        idx   = int(np.argmax(probs, axis=1)[0])
+        return self.LABELS[idx]
+
+    def listen_and_predict(self) -> str:
+        """
+        Convenience method: record, predict, and print.
+        """
+        audio   = self.record()
+        command = self.predict(audio)
+        print("🗣️  Predicted command:", command)
+        return command
+
+
 if __name__ == "__main__":
-    audio = record_audio()
-    command = predict_command(audio)
-    print("Predicted command:", command)
+    # Quick smoke-test
+    MODEL_DIR = "/Users/mariushorn/Desktop/hvl/6_semester/DAT255/Eksamensoppgave/DAT255-VoiceCommandAssistant/models"
+    recognizer = VoiceCommandRecognizer(MODEL_DIR)
+    recognizer.listen_and_predict()

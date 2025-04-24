@@ -1,7 +1,7 @@
 import numpy as np
 import tensorflow as tf
 from sklearn.model_selection import train_test_split
-from CNNmodel_2 import build_cnn
+from src.CNN_models.CNNmodel_2 import build_cnn
 
 # Load preprocessed features and labels
 X = np.load("/Users/sondrerisnes/Documents/GitHub/DAT255-VoiceCommandAssistant/data/processed/X.npy")

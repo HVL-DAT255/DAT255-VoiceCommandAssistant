@@ -139,8 +139,10 @@ if st.button("Speak Command"):
                 if winner:
                     if winner == "Draw":
                         st.warning("Game Over: Draw!")
+                        st.snow()
                     else:
                         st.warning(f"Game Over: {winner} wins!")
+                        st.balloons()
                 else:
                     # O’s random move
                     free = [i for i, v in enumerate(st.session_state.board) if v == " "]

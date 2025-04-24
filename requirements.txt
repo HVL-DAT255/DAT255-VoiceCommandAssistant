@@ -44,11 +44,10 @@ sounddevice==0.5.1
 soundfile==0.13.1
 SpeechRecognition==3.14.2
 streamlit==1.44.1
-tensorboard==2.15.2
-tensorboard-data-server==0.7.2
+tensorboard>=2.19.0,<2.20.0
+tensorboard-data-server>=0.7.2
+tensorflow-estimator>=2.15.0,<2.20.0
 tensorflow>=2.19.0,<2.20.0
-tensorflow-estimator==2.15.0
 tensorflow-io-gcs-filesystem==0.37.1
-tensorflow-macos==2.15.1
-tensorflow-metal==1.1.0
+
 

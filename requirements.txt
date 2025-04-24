@@ -1,12 +1,12 @@
 # ───────── Core ML stack ──────────────────────────────────────────
 tensorflow==2.19.0
-tensorflow-estimator==2.19.0
-tensorboard==2.19.1
-tensorflow-io-gcs-filesystem==0.36.0
-
+# (no more tensorflow-estimator—TF brings in the matching version automatically)
+tensorboard==2.19.0
+tensorboard-data-server==0.7.2
+tensorflow-io-gcs-filesystem==0.37.1
 
 # ───────── Scientific / numeric libs ─────────────────────────────
-numpy>=1.23,<1.26
+numpy>=1.26.0,<2.2.0
 numba==0.59.1
 pandas==2.2.3
 

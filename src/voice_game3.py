@@ -137,10 +137,31 @@ if st.button("Speak Command"):
                 st.session_state.board[idx] = st.session_state.current_player
                 winner = check_winner(st.session_state.board)
                 if winner:
+                    # —— special end-game effects! ——
                     if winner == "Draw":
                         st.warning("Game Over: Draw!")
-                    else:
-                        st.warning(f"Game Over: {winner} wins!")
+                        st.snow()
+                    elif winner == "X":
+                        st.success("🎉 You win! 🎉")
+                        st.balloons()
+                    else:  # O wins
+                        st.error("💔 Oh no! You lost. 💔")
+                        st.markdown(
+                            """
+                            <script>
+                              const b = document.body;
+                              let t = 0;
+                              const shake = setInterval(() => {
+                                b.style.transform = `translate(${(Math.random()-0.5)*10}px, ${(Math.random()-0.5)*10}px)`;
+                                if (++t > 15) {
+                                  clearInterval(shake);
+                                  b.style.transform = '';
+                                }
+                              }, 50);
+                            </script>
+                            """,
+                            unsafe_allow_html=True,
+                        )
                 else:
                     # O’s random move
                     free = [i for i, v in enumerate(st.session_state.board) if v == " "]
@@ -152,8 +173,28 @@ if st.button("Speak Command"):
                         if w:
                             if w == "Draw":
                                 st.warning("Game Over: Draw!")
+                                st.snow()
+                            elif w == "X":
+                                st.success("🎉 You win! 🎉")
+                                st.balloons()
                             else:
-                                st.warning(f"Game Over: {w} wins!")
+                                st.error("💔 Oh no! You lost. 💔")
+                                st.markdown(
+                                    """
+                                    <script>
+                                      const b = document.body;
+                                      let t = 0;
+                                      const shake = setInterval(() => {
+                                        b.style.transform = `translate(${(Math.random()-0.5)*10}px, ${(Math.random()-0.5)*10}px)`;
+                                        if (++t > 15) {
+                                          clearInterval(shake);
+                                          b.style.transform = '';
+                                        }
+                                      }, 50);
+                                    </script>
+                                    """,
+                                    unsafe_allow_html=True,
+                                )
             else:
                 st.warning("Cell taken—try another.")
         else:

@@ -1,13 +1,13 @@
 # ───────── Core ML stack ──────────────────────────────────────────
-tensorflow==2.19.1               # includes Keras 2.19, TF-Lite, etc.
+tensorflow==2.19.0               # latest full TF wheel for Py 3.10 / 3.11
 tensorflow-estimator==2.19.0
-tensorboard==2.19.1
+tensorboard==2.19.0
 tensorboard-data-server==0.7.2
-tensorflow-io-gcs-filesystem==0.36.0  # choose a wheel built for your Python
+tensorflow-io-gcs-filesystem==0.36.0  # 0.37+ has no cp310 wheels yet
 
 # ───────── Scientific / numeric libs ─────────────────────────────
 numpy>=1.23,<1.26                # TF 2.19 requires <1.26
-numba==0.59.1                    # last version supporting NumPy <1.26
+numba==0.59.1                    # compatible with NumPy <1.26
 pandas==2.2.3
 
 # ───────── Audio / DSP stack ─────────────────────────────────────
@@ -19,12 +19,12 @@ soundfile==0.13.1
 SpeechRecognition==3.14.2
 
 # ───────── Plotting / visualisation ──────────────────────────────
-matplotlib==3.9.0
+matplotlib==3.8.4                # last release with universal wheels
 
 # ───────── Data science / utilities ──────────────────────────────
 scikit-learn==1.5.0
 streamlit==1.44.1
-pygame==2.6.1                    # (if you really need it)
+pygame==2.6.1                    # (optional)
 
 # ───────── Google / auth libs ────────────────────────────────────
 google-pasta==0.2.0

@@ -1,213 +1,82 @@
-
-import streamlit as st
+import gradio as gr
 import numpy as np
-import time
 import random
-import os
-# and whatever else you need...
+import librosa
 from live_predict2 import VoiceCommandRecognizer
 
+recognizer    = VoiceCommandRecognizer("models")
+INPUT_INTERVAL = 3.0
 
+def init_state():
+    return {"board":[" "]*9, "sel":4, "last":0}
 
-# ====================== Session State Initialization ======================
-if "board" not in st.session_state:
-    st.session_state.board = [" "] * 9
-if "selected_cell" not in st.session_state:
-    st.session_state.selected_cell = 4  # Start in center
-if "current_player" not in st.session_state:
-    st.session_state.current_player = "X"  # Human is X, computer is O
-if "last_input_time" not in st.session_state:
-    st.session_state.last_input_time = time.time()
+def move_cursor(sel, d):
+    r,c = divmod(sel,3)
+    if d=="up"    and r>0:    r-=1
+    if d=="down"  and r<2:    r+=1
+    if d=="left"  and c>0:    c-=1
+    if d=="right" and c<2:    c+=1
+    return r*3+c
 
-# Interval (in seconds) between voice commands
-input_interval = 3.0
-
-# ====================== Instantiate the recognizer ======================
-MODEL_DIR = "/Users/mariushorn/Desktop/hvl/6_semester/DAT255/Eksamensoppgave/DAT255-VoiceCommandAssistant/models"
-recognizer = VoiceCommandRecognizer(MODEL_DIR)
-
-# ====================== Game Logic ======================
-def move_cursor(selected_cell, direction):
-    row = selected_cell // 3
-    col = selected_cell % 3
-    if direction == "up" and row > 0:
-        row -= 1
-    elif direction == "down" and row < 2:
-        row += 1
-    elif direction == "left" and col > 0:
-        col -= 1
-    elif direction == "right" and col < 2:
-        col += 1
-    return row * 3 + col
-
-def check_winner(board):
-    wins = [
-        [0,1,2], [3,4,5], [6,7,8],   # rows
-        [0,3,6], [1,4,7], [2,5,8],   # cols
-        [0,4,8], [2,4,6]             # diagonals
-    ]
-    for a, b, c in wins:
-        if board[a] == board[b] == board[c] and board[a] != " ":
-            return board[a]
-    if " " not in board:
-        return "Draw"
-    return None
-
-def format_board_html(board, selected_cell):
-    """
-    Return an HTML table to display the board, highlighting the selected cell
-    and coloring X and O differently.
-    """
-    html = """
-    <style>
-    .tictactoe {
-      border-collapse: collapse;
-      margin: 0 auto;
-      table-layout: fixed;
-      width: 210px; /* 3 columns * 70px */
-    }
-    .tictactoe td {
-      border: 2px solid #ccc;
-      width: 70px; height: 70px;
-      text-align: center; vertical-align: middle;
-      font-size: 28px; font-weight: bold;
-      font-family: sans-serif;
-    }
-    .selected { background-color: #FFE066; }
-    .x-cell    { color: #FF3333; }
-    .o-cell    { color: #3333FF; }
-    </style>
-    <table class="tictactoe">
-    """
+def format_board(b, sel):
+    # (same HTML/CSS you already have)
+    html = "<table style='border-collapse:collapse;margin:0 auto;'>"
     for r in range(3):
         html += "<tr>"
         for c in range(3):
-            i = r*3 + c
-            val = board[i]
-            classes = []
-            if i == selected_cell:
-                classes.append("selected")
-            if val == "X":
-                classes.append("x-cell")
-            elif val == "O":
-                classes.append("o-cell")
-            cls = " ".join(classes)
-            disp = val if val != " " else ""
-            html += f'<td class="{cls}">{disp}</td>'
+            i = r*3+c
+            style = "width:70px;height:70px;border:2px solid #ccc;"
+            if i==sel: style+="background:#FFE066;"
+            color = ""
+            if b[i]=="X": color="color:#FF3333;"
+            if b[i]=="O": color="color:#3333FF;"
+            html += f"<td style='{style}{color}font-size:28px;text-align:center;'>{b[i] if b[i]!=" " else ""}</td>"
         html += "</tr>"
-    html += "</table>"
-    return html
+    return html+"</table>"
 
-# ====================== Streamlit UI ======================
-st.title("Voice-Controlled Tic Tac Toe")
-
-st.markdown(
-    """
-    **Instructions:**
-    - Click **Speak Command** to record your voice.
-    - Commands: **up**, **down**, **left**, **right**, **yes**  
-    - **yes** places your X in the highlighted cell.  
-    - Computer (O) then moves randomly.
-    """
-)
-
-# Initial board render
-board_html = format_board_html(
-    st.session_state.board,
-    st.session_state.selected_cell
-)
-board_placeholder = st.empty()
-board_placeholder.markdown(board_html, unsafe_allow_html=True)
-
-if st.button("Speak Command"):
+def step(audio, state):
+    import time
     now = time.time()
-    if now - st.session_state.last_input_time >= input_interval:
-        st.session_state.last_input_time = now
+    if now - state["last"] < INPUT_INTERVAL:
+        return format_board(state["board"],state["sel"]), "⏳ Please wait…", state
+    state["last"] = now
 
-        st.info("Listening...")
-        command = recognizer.listen_and_predict()
-        st.success(f"Predicted command: **{command}**")
+    # load & resample to recognizer.SAMPLE_RATE
+    y, sr = librosa.load(audio.name, sr=recognizer.SAMPLE_RATE)
+    cmd   = recognizer.predict(y.astype("float32"))
 
-        # move cursor or place mark
-        if command in ["up","down","left","right"]:
-            st.session_state.selected_cell = move_cursor(
-                st.session_state.selected_cell, command
-            )
-        elif command == "yes":
-            idx = st.session_state.selected_cell
-            if st.session_state.board[idx] == " ":
-                # place X
-                st.session_state.board[idx] = st.session_state.current_player
-                winner = check_winner(st.session_state.board)
-                if winner:
-                    # —— special end-game effects! ——
-                    if winner == "Draw":
-                        st.warning("Game Over: Draw!")
-                        st.snow()
-                    elif winner == "X":
-                        st.success("🎉 You win! 🎉")
-                        st.balloons()
-                    else:  # O wins
-                        st.error("💔 Oh no! You lost. 💔")
-                        st.markdown(
-                            """
-                            <script>
-                              const b = document.body;
-                              let t = 0;
-                              const shake = setInterval(() => {
-                                b.style.transform = `translate(${(Math.random()-0.5)*10}px, ${(Math.random()-0.5)*10}px)`;
-                                if (++t > 15) {
-                                  clearInterval(shake);
-                                  b.style.transform = '';
-                                }
-                              }, 50);
-                            </script>
-                            """,
-                            unsafe_allow_html=True,
-                        )
-                else:
-                    # O’s random move
-                    free = [i for i, v in enumerate(st.session_state.board) if v == " "]
-                    if free:
-                        mv = random.choice(free)
-                        st.session_state.board[mv] = "O"
-                        st.session_state.current_player = "X"
-                        w = check_winner(st.session_state.board)
-                        if w:
-                            if w == "Draw":
-                                st.warning("Game Over: Draw!")
-                                st.snow()
-                            elif w == "X":
-                                st.success("🎉 You win! 🎉")
-                                st.balloons()
-                            else:
-                                st.error("💔 Oh no! You lost. 💔")
-                                st.markdown(
-                                    """
-                                    <script>
-                                      const b = document.body;
-                                      let t = 0;
-                                      const shake = setInterval(() => {
-                                        b.style.transform = `translate(${(Math.random()-0.5)*10}px, ${(Math.random()-0.5)*10}px)`;
-                                        if (++t > 15) {
-                                          clearInterval(shake);
-                                          b.style.transform = '';
-                                        }
-                                      }, 50);
-                                    </script>
-                                    """,
-                                    unsafe_allow_html=True,
-                                )
+    msg = ""
+    if cmd in ["up","down","left","right"]:
+        state["sel"] = move_cursor(state["sel"], cmd)
+        msg = f"Moved {cmd}"
+    elif cmd=="yes":
+        idx = state["sel"]
+        if state["board"][idx]==" ":
+            state["board"][idx] = "X"
+            # check X win / draw…
+            free = [i for i,v in enumerate(state["board"]) if v==" "]
+            if free:
+                mv = random.choice(free)
+                state["board"][mv] = "O"
+                msg = "You played X; computer moved"
             else:
-                st.warning("Cell taken—try another.")
+                msg = "Game Over"
         else:
-            st.warning("Unrecognized command.")
-
-        # re-render board
-        board_html = format_board_html(
-            st.session_state.board,
-            st.session_state.selected_cell
-        )
-        board_placeholder.markdown(board_html, unsafe_allow_html=True)
+            msg = "Cell taken"
     else:
-        st.warning("Please wait a few seconds before speaking again.")
+        msg = "Unrecognized command"
+
+    return format_board(state["board"],state["sel"]), msg, state
+
+with gr.Blocks() as demo:
+    state = gr.State(init_state())
+    board = gr.HTML(format_board(state.value["board"],state.value["sel"]))
+    status = gr.Text()
+    mic    = gr.Audio(source="microphone", type="filepath")
+    btn    = gr.Button("🎙️ Speak Command")
+
+    btn.click(fn=step,
+              inputs=[mic, state],
+              outputs=[board, status, state])
+
+demo.launch()

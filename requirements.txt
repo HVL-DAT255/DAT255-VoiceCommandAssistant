@@ -1,3 +1,4 @@
+
 tensorflow
 librosa
 numpy
@@ -8,4 +9,4 @@ SpeechRecognition
 PyAudio
 matplotlib
 seaborn
-
+pandas

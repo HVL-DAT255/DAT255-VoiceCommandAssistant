@@ -4,9 +4,9 @@ import numpy as np
 import os
 import tensorflow as tf
 
-DATA_DIR = "/Users/sondrerisnes/Documents/GitHub/DAT255-VoiceCommandAssistant/data/raw"
+DATA_DIR = "/Users/mariushorn/Desktop/hvl/6_semester/DAT255/Eksamensoppgave/DAT255-VoiceCommandAssistant/data/raw"
 COMMANDS = ["up", "down", "left", "right", "yes"]
-OUTPUT_DIR = "/Users/sondrerisnes/Documents/GitHub/DAT255-VoiceCommandAssistant/data/processed"
+OUTPUT_DIR = "/Users/mariushorn/Desktop/hvl/6_semester/DAT255/Eksamensoppgave/DAT255-VoiceCommandAssistant/data/processed"
 
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 

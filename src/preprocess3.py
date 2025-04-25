@@ -1,13 +1,4 @@
-"""
-preprocess.py – extract MFCC / log‑Mel / MFCC‑Δ‑ΔΔ features
-and (optionally) an *augmented* MFCC variant.
 
-Usage
------
->>> from preprocess import preprocess_audio, save_features
->>> feats = preprocess_audio("…/yes/0abcd.wav", method="mfcc_aug")
->>> save_features(method="mfcc_aug")          # writes X_mfcc_aug.npy / y_…
-"""
 
 from __future__ import annotations
 import os
@@ -43,18 +34,7 @@ def preprocess_audio(
         n_fft       : int = 512,
         hop_length  : int = 256
 ) -> np.ndarray:
-    """
-    Load a WAV file, pad/trim to *max_length* samples, then return
-    features according to *method*:
-
-    +--------------+----------------------------------------------------+
-    | "mfcc"       | plain MFCCs (shape = 40 × T)                       |
-    | "mfcc_aug"   | same as "mfcc", **but waveform first passes        |
-    |              | through `augment_waveform()`**                     |
-    | "log_mel"    | log‑Mel spectrogram (n_mels × T)                   |
-    | "deltas"     | MFCC + Δ + ΔΔ (3·n_mfcc × T)                       |
-    +--------------+----------------------------------------------------+
-    """
+    
     # ---------------- read / pad / truncate ---------------- #
     y, _ = librosa.load(file_path, sr=sr)
     y = librosa.util.fix_length(y, size=max_length)
@@ -93,9 +73,7 @@ def preprocess_audio(
     )
 
 
-# --------------------------------------------------------------------------- #
-# Batch‑processing helper
-# --------------------------------------------------------------------------- #
+
 def save_features(method: str = "mfcc") -> None:
     """
     Iterate over COMMANDS/*/*.wav, extract features with given *method*,

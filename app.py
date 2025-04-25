@@ -9,7 +9,7 @@ from live_predict2 import VoiceCommandRecognizer
 
 
 
-# ====================== Session State Initialization ======================
+
 if "board" not in st.session_state:
     st.session_state.board = [" "] * 9
 if "selected_cell" not in st.session_state:
@@ -22,11 +22,11 @@ if "last_input_time" not in st.session_state:
 # Interval (in seconds) between voice commands
 input_interval = 3.0
 
-# ====================== Instantiate the recognizer ======================
+
 MODEL_DIR = "/Users/mariushorn/Desktop/hvl/6_semester/DAT255/Eksamensoppgave/DAT255-VoiceCommandAssistant/models"
 recognizer = VoiceCommandRecognizer(MODEL_DIR)
 
-# ====================== Game Logic ======================
+
 def move_cursor(selected_cell, direction):
     row = selected_cell // 3
     col = selected_cell % 3

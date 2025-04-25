@@ -1,8 +1,3 @@
-#!/usr/bin/env python3
-# ────────────────────────────────────────────────────────────────────
-# Train an LSTM‑based (or CNN) audio‑command classifier on any
-# features exported by preprocess.py (mfcc, mfcc_aug, log_mel, …).
-# ────────────────────────────────────────────────────────────────────
 
 import argparse, os, sys, numpy as np, tensorflow as tf
 from tensorflow.keras.models import Model
@@ -14,21 +9,16 @@ from sklearn.utils import class_weight
 from sklearn.metrics import classification_report, confusion_matrix
 from pathlib import Path
 
-# ---------------- edit your folders here ---------------- #
 ROOT         = Path(__file__).resolve().parents[2]          # project root
 PROCESSED_DIR= ROOT / "data" / "processed"
 MODEL_DIR    = ROOT / "models"
-# -------------------------------------------------------- #
 
-# ───────────────────────────────────────────────────────── #
-# Data loader
-# ───────────────────────────────────────────────────────── #
 def load_data(method: str):
     """Load X_<method>.npy & y_<method>.npy and prep for the network."""
     X = np.load(PROCESSED_DIR / f"X_{method}.npy")
     y = np.load(PROCESSED_DIR / f"y_{method}.npy")
 
-    # (samples, n_feats, n_frames) → (samples, n_frames, n_feats)
+
     X = np.transpose(X, (0, 2, 1))
 
     n_classes = int(y.max() + 1)
@@ -36,9 +26,6 @@ def load_data(method: str):
     return X.astype("float32"), y_cat.astype("float32"), n_classes
 
 
-# ───────────────────────────────────────────────────────── #
-# Architectures
-# ───────────────────────────────────────────────────────── #
 def lstm_model(input_shape, n_classes,
                lstm1=128, lstm2=64, drop=0.3, conv_filters=64) -> Model:
     """Conv1D → Bi‑LSTM → Dropout → Bi‑LSTM → Dense."""
@@ -81,9 +68,7 @@ def cnn_model(input_shape, n_classes,
     return model
 
 
-# ───────────────────────────────────────────────────────── #
-# Optional Keras‑Tuner search  (very small search space demo)
-# ───────────────────────────────────────────────────────── #
+
 def tune_hyperparams(X_train, y_train, input_shape, n_classes):
     import keras_tuner as kt
 
@@ -157,7 +142,7 @@ def train(method: str, do_tune: bool):
     print("✓ Saved to", out)
 
 
-# ───────────────────────────────────────────────────────── #
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--method", default="mfcc",
@@ -166,6 +151,6 @@ if __name__ == "__main__":
                         help="run a random‑search hyper‑parameter tuning first")
     args = parser.parse_args()
 
-    # quick comparison: LSTM vs CNN (optional)
-    train(args.method, do_tune=args.tune)        # LSTM (optionally tuned)
-    train(args.method, do_tune=False)            # CNN baseline
+
+    train(args.method, do_tune=args.tune)       
+    train(args.method, do_tune=False)            

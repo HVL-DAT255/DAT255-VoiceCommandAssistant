@@ -109,13 +109,7 @@ def format_board_html(board, selected_cell):
 st.title("Voice-Controlled Tic Tac Toe")
 
 st.markdown(
-    """
-    **Instructions:**
-    - Press **Speak Command** to record your voice.
-    - Supported commands: **up**, **down**, **left**, **right**, **yes**.
-    - **"yes"** places your mark (X) on the highlighted cell.
-    - The computer (O) makes a random move afterward.
-    """
+  
 )
 
 # Build and display the HTML board

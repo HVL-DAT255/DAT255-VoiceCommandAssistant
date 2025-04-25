@@ -15,7 +15,7 @@ os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 # Optional waveform‑level augmentation helper
 try:
-    from augment import augment_waveform   # your own function
+    from src.preprocessing.augment import augment_waveform   # your own function
 except ImportError:
     augment_waveform = None                # no augmentation available
 

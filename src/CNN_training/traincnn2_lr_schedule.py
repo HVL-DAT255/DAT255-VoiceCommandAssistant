@@ -4,7 +4,6 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report
 from ..CNN_models.CNNmodel_2 import build_cnn  
 
-# Load data
 X = np.load("data/processed/X.npy")
 y = np.load("data/processed/y.npy")
 X = np.expand_dims(X, axis=-1)  # Add channel dim
@@ -21,17 +20,14 @@ def scheduler(epoch, lr):
 
 lr_callback = tf.keras.callbacks.LearningRateScheduler(scheduler)
 
-# Early stopping for stability
 early_stopping = tf.keras.callbacks.EarlyStopping(
     patience=5,
     restore_best_weights=True,
     verbose=1
 )
 
-# Build model
 model = build_cnn(input_shape=X.shape[1:], num_classes=len(set(y)))
 
-# Train model
 history = model.fit(
     X_train, y_train,
     epochs=20,
@@ -40,11 +36,9 @@ history = model.fit(
     callbacks=[early_stopping, lr_callback]
 )
 
-# Save model
 model.save("models/speech_cnn_lr_schedule.h5")
 print("Model training complete! Saved at 'models/speech_cnn_lr_schedule.h5'.")
 
-# Evaluate
 y_pred = model.predict(X_val)
 y_pred_classes = np.argmax(y_pred, axis=1)
 

@@ -4,7 +4,6 @@ from sklearn.model_selection import train_test_split
 from tensorflow.keras import layers, models, regularizers
 from sklearn.metrics import classification_report
 
-# Load data
 X = np.load("data/processed/X.npy")
 y = np.load("data/processed/y.npy")
 X = np.expand_dims(X, axis=-1)

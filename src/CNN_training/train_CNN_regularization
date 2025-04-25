@@ -2,8 +2,8 @@ import numpy as np
 import tensorflow as tf
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report
+from ..CNN_models.CNNmodel_2 import build_cnn
 
-from CNNmodel import build_cnn  # original architecture
 
 # Load data
 X = np.load("data/processed/X.npy")

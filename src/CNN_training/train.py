@@ -1,11 +1,12 @@
 import numpy as np
 import tensorflow as tf
 from sklearn.model_selection import train_test_split
-from CNNmodel import build_cnn
+from ..CNN_models.CNNmodel import build_cnn
+
 
 # Load preprocessed features and labels
-X = np.load("/Users/sondrerisnes/Documents/GitHub/DAT255-VoiceCommandAssistant/data/processed/X.npy")
-y = np.load("/Users/sondrerisnes/Documents/GitHub/DAT255-VoiceCommandAssistant/data/processed/y.npy")
+X = np.load("data/processed/X.npy")
+y = np.load("data/processed/y.npy")
 
 # Reshape for CNN (expand channel dimension)
 X = np.expand_dims(X, axis=-1)  # Shape: (num_samples, 40, time_steps, 1)

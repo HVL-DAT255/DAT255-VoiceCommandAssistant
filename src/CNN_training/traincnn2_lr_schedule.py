@@ -2,11 +2,11 @@ import numpy as np
 import tensorflow as tf
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report
-from src.CNN_models.CNNmodel_2 import build_cnn  
+from ..CNN_models.CNNmodel_2 import build_cnn  
 
 # Load data
-X = np.load("/Users/sondrerisnes/Documents/GitHub/DAT255-VoiceCommandAssistant/data/processed/X.npy")
-y = np.load("/Users/sondrerisnes/Documents/GitHub/DAT255-VoiceCommandAssistant/data/processed/y.npy")
+X = np.load("data/processed/X.npy")
+y = np.load("data/processed/y.npy")
 X = np.expand_dims(X, axis=-1)  # Add channel dim
 
 # Split data

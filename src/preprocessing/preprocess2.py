@@ -16,12 +16,7 @@ def preprocess_audio(file_path,
                      n_mels=64,
                      n_fft=512,
                      hop_length=256):
-    """
-    Load & pad/trunc, then extract features according to method:
-      - "mfcc"      : MFCC only (n_mfcc).
-      - "log_mel"   : log‑Mel spectrogram (n_mels).
-      - "deltas"    : MFCC + Δ + ΔΔ (n_mfcc).
-    """
+    
     y, _ = librosa.load(file_path, sr=sr)
     y = librosa.util.fix_length(y, size=max_length)
 
@@ -50,9 +45,7 @@ def preprocess_audio(file_path,
         raise ValueError(f"Unknown method {method!r}. Choose 'mfcc','log_mel' or 'deltas'.")
 
 def save_features(method="mfcc"):
-    """
-    Process all audio files with the selected method and save X.npy, y.npy.
-    """
+ 
     X, y = [], []
     for label, command in enumerate(COMMANDS):
         path = os.path.join(DATA_DIR, command)

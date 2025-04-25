@@ -11,14 +11,14 @@ OUTPUT_DIR = "/Users/mariushorn/Desktop/hvl/6_semester/DAT255/Eksamensoppgave/DA
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 def preprocess_audio(file_path, max_length=16000):
-    """ Load an audio file, pad or truncate, and extract MFCC features """
+  
     y, sr = librosa.load(file_path, sr=16000)  
     y = librosa.util.fix_length(y, size=max_length)  
     mfcc = librosa.feature.mfcc(y=y, sr=sr, n_mfcc=40)  
     return mfcc
 
 def save_features():
-    """ Process all audio files and save as numpy arrays """
+
     X, y = [], []
     
     for label, command in enumerate(COMMANDS):

@@ -13,18 +13,14 @@ PROCESSED_DIR = "/Users/mariushorn/Desktop/hvl/6_semester/DAT255/Eksamensoppgave
 MODEL_DIR = "/Users/mariushorn/Desktop/hvl/6_semester/DAT255/Eksamensoppgave/DAT255-VoiceCommandAssistant/models"
 
 def load_data():
-    """
-    Load preprocessed data from .npy files and prepare it for training.
-    The MFCC features are transposed to shape: (num_samples, time_steps, num_features).
-    Labels are converted to one-hot encoding.
-    """
+    
     X_path = os.path.join(PROCESSED_DIR, "X.npy")
     y_path = os.path.join(PROCESSED_DIR, "y.npy")
     
     X = np.load(X_path)
     y = np.load(y_path)
     
-    # Transpose MFCC features to (NUM_SAMPLES, NUM_TIMESTEPS, NUM_FEATURES)
+
     X = np.transpose(X, (0, 2, 1))
     
     num_classes = len(np.unique(y))
@@ -33,15 +29,12 @@ def load_data():
     return X, y_cat, num_classes
 
 def build_lstm_model(input_shape, num_classes):
-    """
-    Build an improved model using a Conv1D layer, BatchNormalization,
-    and Bidirectional LSTM layers to capture temporal dependencies in both directions.
-    """
+   
     inputs = Input(shape=input_shape)
-    # Use a Conv1D layer to extract local features from MFCC sequences
+
     x = Conv1D(filters=64, kernel_size=3, activation='relu', padding='same')(inputs)
     x = BatchNormalization()(x)
-    # Use Bidirectional LSTM layers
+
     x = Bidirectional(LSTM(128, return_sequences=True))(x)
     x = Dropout(0.3)(x)
     x = Bidirectional(LSTM(64))(x)
@@ -54,24 +47,13 @@ def build_lstm_model(input_shape, num_classes):
     return model
 
 def augment_data(X, noise_factor=0.05):
-    """
-    Perform simple augmentation by adding Gaussian noise to the MFCC features.
-    X is assumed to be of shape (num_samples, time_steps, num_features).
-    """
+   
     # Generate noise with the same shape as X
     noise = noise_factor * np.random.randn(*X.shape)
     return X + noise
 
 def train_and_save_model():
-    """
-    1. Load data and create a train/test split.
-    2. Compute class weights to help improve recall.
-    3. Augment the training data by adding random noise.
-    4. Build the improved model.
-    5. Train the model using early stopping and learning rate reduction callbacks.
-    6. Evaluate the model on the test set and print a confusion matrix and classification report.
-    7. Save the model using the native Keras format.
-    """
+
     # 1. Load data
     X, y_cat, num_classes = load_data()
     print("Data loaded. X shape:", X.shape, "y shape:", y_cat.shape)

@@ -25,7 +25,7 @@ assert n_mfcc == N_MFCC, (
 
 # ──────────────────────────────────────────────────────────────────────────────
 def record_clip():
-    """Record a SHORT clip from the default microphone."""
+    
     print("🎙️  Listening… Speak now!")
     audio = sd.rec(int(DURATION * SAMPLE_RATE),
                    samplerate=SAMPLE_RATE,
@@ -36,11 +36,7 @@ def record_clip():
     return np.squeeze(audio)
 
 def mfcc_from_audio(y):
-    """
-    Compute MFCC → shape (N_MFCC, T_raw)
-    Pad / crop along time axis to exactly `time_steps`,
-    then transpose to (T, N_MFCC) so it matches the LSTM input.
-    """
+   
     m = librosa.feature.mfcc(
         y=y,
         sr=SAMPLE_RATE,

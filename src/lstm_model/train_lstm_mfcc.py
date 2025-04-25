@@ -1,5 +1,4 @@
-#!/usr/bin/env python3
-# src/model/train_lstm_mfcc.py
+
 
 import os
 import numpy as np
@@ -14,12 +13,11 @@ from sklearn.model_selection import train_test_split
 from sklearn.utils import class_weight
 from sklearn.metrics import classification_report, confusion_matrix
 
-# ——— CONFIG —————————————————————————————————————————————————————————————
-# Point these to wherever you've saved X_mfcc.npy / y_mfcc.npy
+
 PROCESSED_DIR = "/Users/mariushorn/Desktop/hvl/6_semester/DAT255/Eksamensoppgave/DAT255-VoiceCommandAssistant/data/processed"
 MODEL_DIR     = "/Users/mariushorn/Desktop/hvl/6_semester/DAT255/Eksamensoppgave/DAT255-VoiceCommandAssistant/models"
 METHOD        = "mfcc"   # loads X_mfcc.npy / y_mfcc.npy
-# ————————————————————————————————————————————————————————————————————————
+
 
 def load_data(method=METHOD):
     """
@@ -30,7 +28,6 @@ def load_data(method=METHOD):
     X = np.load(os.path.join(PROCESSED_DIR, f"X_{method}.npy"))
     y = np.load(os.path.join(PROCESSED_DIR, f"y_{method}.npy"))
 
-    # swap (feat,frames) → (frames,feat)
     X = np.transpose(X, (0, 2, 1))
 
     n_classes = len(np.unique(y))

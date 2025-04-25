@@ -5,9 +5,9 @@ from sklearn.metrics import confusion_matrix
 import seaborn as sns
 
 # Load model and data
-model = tf.keras.models.load_model("models/speech_cnn_batchnorm.h5")
-X = np.load("data/processed/X.npy")
-y = np.load("data/processed/y.npy")
+model = tf.keras.models.load_model("models/lstm_mfcc.keras")
+X = np.load("data/processed/X_mfcc.npy")
+y = np.load("data/processed/y_mfcc.npy")
 
 # Prepare input shape
 X = np.expand_dims(X, axis=-1)

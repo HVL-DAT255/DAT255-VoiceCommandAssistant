@@ -7,18 +7,18 @@ from ..CNN_models.CNNmodel_2 import build_cnn
 X = np.load("data/processed/X.npy")
 y = np.load("data/processed/y.npy")
 
-# Reshape for CNN (expand channel dimension)
-X = np.expand_dims(X, axis=-1)  # Shape: (num_samples, 40, time_steps, 1)
 
-# Split into training (80%) and validation (20%)
+X = np.expand_dims(X, axis=-1)  
+
+
 X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.2, random_state=42)
 
 print(f"Training data shape: {X_train.shape}, Validation data shape: {X_val.shape}")
 
-# Define model
+
 model = build_cnn(input_shape=X.shape[1:], num_classes=len(set(y)))
 
-# Define early stopping
+
 early_stopping = tf.keras.callbacks.EarlyStopping(
     patience=5,
     restore_best_weights=True,

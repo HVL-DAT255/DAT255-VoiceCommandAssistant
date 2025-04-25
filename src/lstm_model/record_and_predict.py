@@ -26,13 +26,13 @@ def extract_mfcc(y, sr=SAMPLE_RATE):
     return mfcc
 
 def predict_command(audio):
-    # Extract MFCC features (shape will be (40, 32))
+
     mfcc = extract_mfcc(audio)
-    # Transpose so that time axis comes first: (32, 40)
+  
     mfcc = mfcc.T
-    # Add batch dimension to get shape (1, 32, 40)
+ 
     mfcc = np.expand_dims(mfcc, axis=0)
-    # Get prediction probabilities from the model
+
     prediction = model.predict(mfcc)
     pred_index = np.argmax(prediction)
     return LABELS[pred_index]

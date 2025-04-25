@@ -19,21 +19,7 @@ MODEL_DIR = "/Users/mariushorn/Desktop/hvl/6_semester/DAT255/Eksamensoppgave/DAT
 MODEL_PATH = os.path.join(MODEL_DIR, "lstm_net_mfcc.keras")
 
 def pad_or_truncate(mfcc: np.ndarray, target_frames: int) -> np.ndarray:
-    """
-    Ensure MFCC has exactly `target_frames` frames (second dimension).
-
-    Parameters
-    ----------
-    mfcc : np.ndarray
-        Shape (40, T)       – output of preprocess_audio()
-    target_frames : int
-        Desired T (time‑steps) count – taken from model.input_shape[1]
-
-    Returns
-    -------
-    np.ndarray
-        Shape (40, target_frames)
-    """
+   
     n_mfcc, T = mfcc.shape
     if T < target_frames:                        # pad with zeros on the right
         pad_width = target_frames - T
@@ -44,17 +30,7 @@ def pad_or_truncate(mfcc: np.ndarray, target_frames: int) -> np.ndarray:
 
 
 def predict_command(wav_path: str) -> str:
-    """
-    Predict the spoken command contained in `wav_path`.
-
-    Returns the best class label as a string and prints the probabilities.
-
-    Notes
-    -----
-    * Expects that the training script stored the model with a *fixed* time
-      dimension (e.g. input shape (None, 63, 40)).  The helper above pads/
-      truncates the incoming file to that length.
-    """
+    
 
     # 1) load model ----------------------------------------------------------
     model = tf.keras.models.load_model(MODEL_PATH)

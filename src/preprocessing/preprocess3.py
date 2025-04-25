@@ -5,24 +5,20 @@ import os
 import librosa
 import numpy as np
 
-# --------------------------------------------------------------------------- #
-# Configuration
-# --------------------------------------------------------------------------- #
+
 DATA_DIR     = "/Users/mariushorn/Desktop/hvl/6_semester/DAT255/Eksamensoppgave/DAT255-VoiceCommandAssistant/data/raw"
 OUTPUT_DIR   = "/Users/mariushorn/Desktop/hvl/6_semester/DAT255/Eksamensoppgave/DAT255-VoiceCommandAssistant/data/processed"
-COMMANDS     = ["up", "down", "left", "right", "yes"]      # <== keep order!
+COMMANDS     = ["up", "down", "left", "right", "yes"]      
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
-# Optional waveform‑level augmentation helper
+
 try:
-    from src.preprocessing.augment import augment_waveform   # your own function
+    from src.preprocessing.augment import augment_waveform  
 except ImportError:
-    augment_waveform = None                # no augmentation available
+    augment_waveform = None              
 
 
-# --------------------------------------------------------------------------- #
-# Core feature extractor
-# --------------------------------------------------------------------------- #
+
 def preprocess_audio(
         file_path: str,
         *,
@@ -35,27 +31,27 @@ def preprocess_audio(
         hop_length  : int = 256
 ) -> np.ndarray:
     
-    # ---------------- read / pad / truncate ---------------- #
+    
     y, _ = librosa.load(file_path, sr=sr)
     y = librosa.util.fix_length(y, size=max_length)
 
-    # --------------- optional augmentation ---------------- #
+ 
     if method == "mfcc_aug":
         if augment_waveform is None:
             raise RuntimeError(
                 "augment_waveform() not available; cannot use method 'mfcc_aug'."
             )
         y = augment_waveform(y, sr=sr)
-        method = "mfcc"            # fall through to standard MFCC branch
+        method = "mfcc"            
 
-    # --------------------- features ------------------------ #
+
     if method == "log_mel":
         S = librosa.feature.melspectrogram(
             y=y, sr=sr, n_mels=n_mels, n_fft=n_fft, hop_length=hop_length
         )
         return librosa.power_to_db(S, ref=np.max)
 
-    # ---- everything else is based on MFCC ---- #
+    
     mfcc = librosa.feature.mfcc(
         y=y, sr=sr, n_mfcc=n_mfcc, n_fft=n_fft, hop_length=hop_length
     )
@@ -75,10 +71,7 @@ def preprocess_audio(
 
 
 def save_features(method: str = "mfcc") -> None:
-    """
-    Iterate over COMMANDS/*/*.wav, extract features with given *method*,
-    save to numpy files in `OUTPUT_DIR` (X_<method>.npy, y_<method>.npy).
-    """
+   
     X, y = [], []
     for label, command in enumerate(COMMANDS):
         folder = os.path.join(DATA_DIR, command)
@@ -97,10 +90,8 @@ def save_features(method: str = "mfcc") -> None:
     print(f"[{method}] Done. X shape = {X.shape}, saved to {OUTPUT_DIR}")
 
 
-# --------------------------------------------------------------------------- #
+
 if __name__ == "__main__":
-    # Uncomment the flavours you want cached on disk
+   
     save_features(method="mfcc")
-    # save_features(method="mfcc_aug")   # augmented MFCCs
-    # save_features(method="log_mel")
-    # save_features(method="deltas")
+

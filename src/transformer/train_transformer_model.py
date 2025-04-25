@@ -27,7 +27,7 @@ def load_dataset():
                     X.append(mfcc)
                     y.append(label_index)
                 except Exception as e:
-                    print(f"⚠️ Failed to process {file_path}: {e}")
+                    print(f"Failed to process {file_path}: {e}")
     return np.array(X), tf.keras.utils.to_categorical(y, NUM_CLASSES)
 
 # Simple Transformer encoder block
@@ -53,7 +53,7 @@ def build_model(input_shape=(SAMPLE_LENGTH, NUM_MFCC)):
 
 # Train & save
 if __name__ == "__main__":
-    print("📥 Loading dataset...")
+    print("Loading dataset...")
     X, y = load_dataset()
     X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.2, random_state=42)
 
@@ -61,9 +61,9 @@ if __name__ == "__main__":
     model = build_model()
     model.compile(optimizer="adam", loss="categorical_crossentropy", metrics=["accuracy"])
 
-    print("🚀 Training...")
+    print(" Training...")
     model.fit(X_train, y_train, validation_data=(X_val, y_val), epochs=50, batch_size=32)
 
     os.makedirs(os.path.dirname(MODEL_PATH), exist_ok=True)
     model.save(MODEL_PATH)
-    print(f"✅ Saved Transformer model to {MODEL_PATH}")
+    print(f" Saved Transformer model to {MODEL_PATH}")

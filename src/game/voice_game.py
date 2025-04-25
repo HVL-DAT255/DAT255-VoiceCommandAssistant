@@ -48,7 +48,7 @@ class VoiceControlledGame(TicTacToeGame):
                 self.draw_board()
                 audio = record_audio()
                 command = predict_command(audio)
-                print(f"🧠 Predicted command: {command}")
+                print(f"Predicted command: {command}")
                 last_input_time = time.time()
 
                 if command in ["up", "down", "left", "right"]:

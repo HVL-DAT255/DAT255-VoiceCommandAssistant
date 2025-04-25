@@ -29,7 +29,7 @@ class VoiceCommandRecognizer:
 
     def record(self) -> np.ndarray:
      
-        print("🎙️  Listening now...")
+        print(" Listening now...")
         data = sd.rec(
             int(self.DURATION * self.SAMPLE_RATE),
             samplerate=self.SAMPLE_RATE,
@@ -62,7 +62,7 @@ class VoiceCommandRecognizer:
       
         audio   = self.record()
         command = self.predict(audio)
-        print("🗣️  Predicted command:", command)
+        print(" Predicted command:", command)
         return command
 
 

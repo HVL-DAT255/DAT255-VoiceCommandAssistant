@@ -5,7 +5,7 @@ import sounddevice as sd
 import librosa
 import tensorflow as tf
 
-# ─── Paths ────────────────────────────────────────────────────────────────────
+
 MODEL_DIR = os.path.expanduser(
     "~/Desktop/hvl/6_semester/DAT255/Eksamensoppgave/"
     "DAT255-VoiceCommandAssistant/models"
@@ -38,8 +38,8 @@ print(f"Model expects shape (None, {TIME_STEPS}, {N_MFCC})")
 
 
 def record_audio(duration=DURATION, sr=SAMPLE_RATE) -> np.ndarray:
-    """Record one clip from the default microphone."""
-    print("🎙️  Listening…")
+    
+    print(" Listening…")
     audio = sd.rec(
         int(duration * sr),
         samplerate=sr,

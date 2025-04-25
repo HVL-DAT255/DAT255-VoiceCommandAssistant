@@ -4,7 +4,7 @@ import numpy as np
 import time
 import random
 import os
-# and whatever else you need...
+
 from live_predict2 import VoiceCommandRecognizer
 
 
@@ -13,13 +13,13 @@ from live_predict2 import VoiceCommandRecognizer
 if "board" not in st.session_state:
     st.session_state.board = [" "] * 9
 if "selected_cell" not in st.session_state:
-    st.session_state.selected_cell = 4  # Start in center
+    st.session_state.selected_cell = 4  
 if "current_player" not in st.session_state:
-    st.session_state.current_player = "X"  # Human is X, computer is O
+    st.session_state.current_player = "X" 
 if "last_input_time" not in st.session_state:
     st.session_state.last_input_time = time.time()
 
-# Interval (in seconds) between voice commands
+
 input_interval = 3.0
 
 
@@ -145,10 +145,10 @@ if st.button("Speak Command"):
                         st.warning("Game Over: Draw!")
                         st.snow()
                     elif winner == "X":
-                        st.success("🎉 You win! 🎉")
+                        st.success("You win!")
                         st.balloons()
                     else:  # O wins
-                        st.error("💔 Oh no! You lost. 💔")
+                        st.error("Oh no! You lost.")
                         st.markdown(
                             """
                             <script>
@@ -178,10 +178,10 @@ if st.button("Speak Command"):
                                 st.warning("Game Over: Draw!")
                                 st.snow()
                             elif w == "X":
-                                st.success("🎉 You win! 🎉")
+                                st.success("You win!")
                                 st.balloons()
                             else:
-                                st.error("💔 Oh no! You lost. 💔")
+                                st.error("Oh no! You lost.")
                                 st.markdown(
                                     """
                                     <script>

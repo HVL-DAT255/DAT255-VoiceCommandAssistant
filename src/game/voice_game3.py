@@ -4,26 +4,26 @@ import time
 import random
 import os
 
-from live_predict2 import VoiceCommandRecognizer  # <-- your new class
+from live_predict2 import VoiceCommandRecognizer 
 
-# ====================== Session State Initialization ======================
+
 if "board" not in st.session_state:
     st.session_state.board = [" "] * 9
 if "selected_cell" not in st.session_state:
-    st.session_state.selected_cell = 4  # Start in center
+    st.session_state.selected_cell = 4  
 if "current_player" not in st.session_state:
-    st.session_state.current_player = "X"  # Human is X, computer is O
+    st.session_state.current_player = "X" 
 if "last_input_time" not in st.session_state:
     st.session_state.last_input_time = time.time()
 
-# Interval (in seconds) between voice commands
+
 input_interval = 3.0
 
-# ====================== Instantiate the recognizer ======================
+
 MODEL_DIR = "/Users/mariushorn/Desktop/hvl/6_semester/DAT255/Eksamensoppgave/DAT255-VoiceCommandAssistant/models"
 recognizer = VoiceCommandRecognizer(MODEL_DIR)
 
-# ====================== Game Logic ======================
+
 def move_cursor(selected_cell, direction):
     row = selected_cell // 3
     col = selected_cell % 3
@@ -51,10 +51,7 @@ def check_winner(board):
     return None
 
 def format_board_html(board, selected_cell):
-    """
-    Return an HTML table to display the board, highlighting the selected cell
-    and coloring X and O differently.
-    """
+ 
     html = """
     <style>
     .tictactoe {
@@ -136,10 +133,10 @@ if st.button("Speak Command"):
                         st.warning("Game Over: Draw!")
                         st.snow()
                     elif winner == "X":
-                        st.success("🎉 You win! 🎉")
+                        st.success("You win!")
                         st.balloons()
                     else:  # O wins
-                        st.error("💔 Oh no! You lost. 💔")
+                        st.error("Oh no! You lost.")
                         st.markdown(
                             """
                             <script>
@@ -169,10 +166,10 @@ if st.button("Speak Command"):
                                 st.warning("Game Over: Draw!")
                                 st.snow()
                             elif w == "X":
-                                st.success("🎉 You win! 🎉")
+                                st.success("You win!")
                                 st.balloons()
                             else:
-                                st.error("💔 Oh no! You lost. 💔")
+                                st.error(" Oh no! You lost. ")
                                 st.markdown(
                                     """
                                     <script>
